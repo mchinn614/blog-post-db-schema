@@ -46,6 +46,7 @@ const BlogPosts = {
   },
   update: function(updatedPost) {
     const { id } = updatedPost;
+    console.log(id);
     const postIndex = this.posts.findIndex(post => post.id === updatedPost.id);
     if (postIndex === -1) {
       throw new StorageException(
