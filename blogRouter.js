@@ -5,9 +5,15 @@ const { BlogPosts } = require("./models");
 const router = express.Router();
 const jsonParser = bodyParser.json();
 
+const item = BlogPosts.create(
+  "Title1",
+  "content: blah blah blah",
+  "author1",
+  "date1"
+);
+
 router.get("/", (req, res) => {
   const results = BlogPosts.get();
-  console.log(results);
   res.send(results);
 });
 
@@ -38,7 +44,7 @@ router.delete("/:id", (req, res) => {
   res.status(204).end();
 });
 
-router.patch("/:id", jsonParser, (req, res) => {
+router.put("/:id", jsonParser, (req, res) => {
   requiredFields = ["title", "content", "author", "publishDate"];
   var updatedItem = {};
   for (let i = 0; i < requiredFields.length; i++) {
@@ -51,7 +57,6 @@ router.patch("/:id", jsonParser, (req, res) => {
     updatedItem[requiredFields[i]] = req.body[requiredFields[i]];
   }
   updatedItem["id"] = req.params.id;
-  console.log(updatedItem);
   const item = BlogPosts.update(updatedItem);
   res.status(202).json(item);
 });
