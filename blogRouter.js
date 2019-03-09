@@ -102,7 +102,6 @@ router.delete("/:id", (req, res) => {
   Blog.deleteOne({ id: req.params.id })
     .then(response => {
       if (response.ok === 1) {
-        console.log(response);
         res.status(204).send(`Number of documents deleted: ${response.ok}`);
       }
     })

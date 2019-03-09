@@ -18,11 +18,11 @@ let server;
 // our server, since we'll be dealing with promises there.
 
 //add connection to mongodb
-function runServer() {
+function runServer(databaseUrl) {
   const port = process.env.PORT || 8080;
+
   return new Promise((resolve, reject) => {
-    mongoose.connect(databaseUrl, { useNewUrlParser: true }, err => {
-      console.log(databaseUrl);
+    return mongoose.connect(databaseUrl, { useNewUrlParser: true }, err => {
       if (err) {
         return reject(err);
       }
@@ -65,7 +65,7 @@ function closeServer() {
 // if server.js is called directly (aka, with `node server.js`), this block
 // runs. but we also export the runServer command so other code (for instance, test code) can start the server as needed.
 if (require.main === module) {
-  runServer().catch(err => console.error(err));
+  runServer(databaseUrl).catch(err => console.error(err));
 }
 
 module.exports = { app, runServer, closeServer };

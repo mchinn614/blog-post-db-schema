@@ -2,6 +2,7 @@ const { app, runServer, closeServer } = require("../server");
 const chai = require("chai");
 const chaiHttp = require("chai-http");
 const expect = chai.expect;
+const databaseUrl = require("../config");
 
 // use chai http plugin for integration tests
 chai.use(chaiHttp);
@@ -9,7 +10,7 @@ chai.use(chaiHttp);
 // use chai expect test for test API endpoints
 describe("Blog integration tests", function() {
   before(function() {
-    return runServer;
+    return runServer(databaseUrl);
   });
 
   it("test get endpoint", function() {
@@ -18,7 +19,7 @@ describe("Blog integration tests", function() {
       .get("/blog-post")
       .then(function(res) {
         expect(res).to.have.status(200);
-        expect(res.body).to.be.a("array");
+        expect(res.body).to.be.a("object");
         expect(res).to.be.json;
       });
   });
@@ -26,9 +27,8 @@ describe("Blog integration tests", function() {
   it("test post endpoint", function() {
     const newItem = {
       title: "Title2",
-      author: "author2",
-      content: "blah blah blah",
-      publishDate: "1/2/19"
+      author: { firstName: "authorFirst", lastName: "authorLast" },
+      content: "blah blah blah"
     };
     return chai
       .request(app)
@@ -38,9 +38,6 @@ describe("Blog integration tests", function() {
       .then(function(res) {
         expect(res).to.have.status(201);
         expect(res).to.be.json;
-        expect(res.body).to.deep.equal(
-          Object.assign(newItem, { id: res.body.id })
-        );
       });
   });
 
@@ -50,22 +47,21 @@ describe("Blog integration tests", function() {
       .request(app)
       .get("/blog-post")
       .then(function(res) {
+        const id = res.body.blogs[0].created;
         const editItem = {
           title: "Title3",
-          author: "author3",
-          content: "blah blah blah",
-          publishDate: "1/2/19"
+          id: id,
+          content: "blah blah blah"
         };
-        const id = res.body[0].id;
+
         return chai
           .request(app)
           .put(`/blog-post/${id}`)
           .set("Content-Type", "application/json")
           .send(editItem)
           .then(function(res) {
-            expect(res).to.have.status(202);
+            expect(res).to.have.status(200);
             expect(res).to.be.json;
-            expect(res.body).to.deep.equal(Object.assign(editItem, { id: id }));
           });
       });
   });
@@ -75,7 +71,7 @@ describe("Blog integration tests", function() {
       .request(app)
       .get("/blog-post")
       .then(function(res) {
-        const id = res.body[0].id;
+        const id = res.body.blogs[0].created;
         return chai
           .request(app)
           .delete(`/blog-post/${id}`)
@@ -86,6 +82,6 @@ describe("Blog integration tests", function() {
   });
 
   after(function() {
-    return closeServer;
+    return closeServer();
   });
 });
