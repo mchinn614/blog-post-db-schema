@@ -2,11 +2,12 @@ var express = require("express");
 var app = express();
 var morgan = require("morgan");
 var blog = require("./blogRouter");
-const databaseUrl = require("./config");
 const mongoose = require("mongoose");
+require("dotenv").config();
+const databaseUrl = process.env.DATABASE_URL;
 
 app.use(morgan("common"));
-app.use("/blog-post", blog);
+app.use("/", blog);
 
 // both runServer and closeServer need to access the same
 // server object, so we declare `server` here, and then when
